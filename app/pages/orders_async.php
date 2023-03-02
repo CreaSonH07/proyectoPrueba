@@ -19,17 +19,16 @@ if ($GPC['type'] == 'list-orders') { ?>
                     <input type="text" class="form-control" name="destino" placeholder="Buscar">
                 </div>
             </div>
-            // pasar de tipo texto a fecha salida y retorno
             <div class="col-6">
                 <div class="form-group">
                     <label>Salida</label>
-                    <input type="date" class="form-control" name="salida" placeholder="Buscar">
+                    <input type="text" class="form-control" name="salida" placeholder="Buscar">
                 </div>
             </div>
             <div class="col-6">
                 <div class="form-group">
                     <label>Retorno</label>
-                    <input type="date" class="form-control" name="retorno" placeholder="Buscar">
+                    <input type="text" class="form-control" name="retorno" placeholder="Buscar">
                 </div>
             </div>
             <div class="col-6">
@@ -38,6 +37,22 @@ if ($GPC['type'] == 'list-orders') { ?>
                     <input type="text" class="form-control" name="total" placeholder="Buscar">
                 </div>
             </div>
+            <!--inicio de hora --->
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Hora</label>
+                    <input type="text" class="form-control" name="hora" placeholder="Ingrese la hora">
+                </div>
+            </div>
+            <!--fin de agregado hora --->
+            <!--inicio de fecha fecha --->
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="text" class="form-control" name="fecha" placeholder="Ingrese la Fecha">
+                </div>
+            </div>
+            <!--fin de agregado fecha --->
         </div>
         <div class="row mb-3 justify-content-between">
             <div class="col-2">
@@ -46,10 +61,10 @@ if ($GPC['type'] == 'list-orders') { ?>
             </div>
 
             <div class="col-2 d-flex justify-content-end">
-                <button type="button" 
-                        class="btn btn-primary btn-load-async" 
-                        data-action="orders_async.php" 
-                        data-type="record-orders" 
+                <button type="button"
+                        class="btn btn-primary btn-load-async"
+                        data-action="orders_async.php"
+                        data-type="record-orders"
                         data-target="main">
                     Agregar
                 </button>
@@ -64,10 +79,11 @@ if ($GPC['type'] == 'list-orders') { ?>
 if ($GPC['type'] == 'filter-orders') {
     $arrOrders = Orders::getInstance()->getOrders($GPC);
     ?>
-    <table class="table table-striped table-border">
+    <table class="table table-striped table-hover">
         <thead>
             <tr>
                 <th>N°</th>
+                <!--agregado ---><th>Estado</th>
                 <th>Origen</th>
                 <th>Destino</th>
                 <th>Salida</th>
@@ -87,19 +103,40 @@ if ($GPC['type'] == 'filter-orders') {
             <?php else : ?>
                 <?php foreach ($arrOrders as $order) : ?>
                     <tr>
-                        <td><?php $order['id'] ?></td>
-                        <td><?php $order['origen'] ?></td>
-                        <td><?php $order['destino'] ?></td>
-                        <td><?php $order['salida'] ?></td>
-                        <td><?php $order['retorno'] ?></td>
-                        <td><?php $order['total'] ?></td>
-                        <td><?php $order['fecha'] ?></td>
-                        <td><?php $order['hora'] ?></td>
+                        <td><?= $order['id'] ?></td>
+                        <!--agregado ---> <td><?php $status = $order['status'];
+                        if ($status == 1) {
+                          echo "<p>Activo </p>";}
+                          elseif ($status == 2) {
+                            echo "<p>en proceso </p>";
+                          }
+                          elseif ($status == 3) {
+                            echo "<p>finalizado </p>";
+                          }
+                          elseif ($status == 4) {
+                            echo "<p>cancelado</p>";
+                          }
+                          elseif ($status == 5) {
+                            echo "<p>anulado </p>";
+                          }
+                          elseif ($status == 6) {
+                            echo "<p>prueba </p>";
+                          }else {
+                            echo "<p>Desconocido</p>";
+                          }
+                         ?></td><!--fin de agregado --->
+                        <td><?= $order['origen'] ?></td>
+                        <td><?= $order['destino'] ?></td>
+                        <td><?= $order['salida'] ?></td>
+                        <td><?= $order['retorno'] ?></td>
+                        <td><?= $order['total'] ?></td>
+                        <td><?= $order['fecha'] ?></td>
+                        <td><?= $order['hora'] ?></td>
                         <td>
-                            <button type="button" 
-                                    class="btn btn-primary btn-load-async" 
-                                    data-action="orders_async.php" 
-                                    data-type="record-orders" 
+                            <button type="button"
+                                    class="btn btn-primary btn-load-async"
+                                    data-action="orders_async.php"
+                                    data-type="record-orders"
                                     data-params="<?php echo toObject(['id' => $order['id']]); ?>"
                                     data-target="main">
                                 Editar
@@ -128,46 +165,46 @@ if ($GPC['type'] == 'record-orders') {
                     <h1><?php echo !$exists ? 'Crear' : 'Actualizar'; ?> orden</h1>
                 </div>
             </div>
-            
+
             <div class="row mb-3">
                 <div class="col-12">
                     <form action="orders_async.php">
                         <input type="hidden" name="type" value="save-order">
-                        <input type="hidden" name="id" value="<?php echo $order['id'] ?>">
+                        <input type="hidden" name="id" value="<?= $order['id'] ?>">
 
                         <div class="form-group">
                             <label>Origen</label>
-                            <input type="text" class="form-control" name="origen" value="<?php echo $order['origen']; ?>">
+                            <input type="text" class="form-control" name="origen" value="<?= $order['origen'] ?>">
                         </div>
 
                         <div class="form-group">
                             <label>Destino</label>
-                            <input type="text" class="form-control" name="destino" value="<?php echo $order['destino']; ?>">
+                            <input type="text" class="form-control" name="destino" value="<?= $order['destino'] ?>">
                         </div>
 
                         <div class="form-group">
                             <label>Salida</label>
-                            <input type="text" class="form-control" name="salida" value="<?php echo $order['salida']; ?>">
+                            <input type="text" class="form-control" name="salida" value="<?= $order['salida'] ?>">
                         </div>
 
                         <div class="form-group">
                             <label>Retorno</label>
-                            <input type="text" class="form-control" name="retorno" value="<?php echo $order['retorno']; ?>">
+                            <input type="text" class="form-control" name="retorno" value="<?= $order['retorno'] ?>">
                         </div>
 
                         <div class="form-group">
                             <label>Total</label>
-                            <input type="text" class="form-control" name="total" value="<?php echo $order['total']; ?>">
+                            <input type="text" class="form-control" name="total" value="<?= $order['total'] ?>">
                         </div>
 
                         <div class="form-group">
                             <label>Fecha</label>
-                            <input type="text" class="form-control" name="fecha" value="<?php echo $order['fecha']; ?>">
+                            <input type="text" class="form-control" name="fecha" value="<?= $order['fecha'] ?>">
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Hora</label>
-                            <input type="text" class="form-control" name="hora" value="<?php echo $order['hora']; ?>">
+                            <input type="text" class="form-control" name="hora" value="<?= $order['hora'] ?>">
                         </div>
                     </form>
                 </div>
